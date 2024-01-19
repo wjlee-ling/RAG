@@ -1,6 +1,8 @@
 {
   "type": "module",
   "dependencies": {
+    "axios": "^1.6.5",
+    "cheerio": "^1.0.0-rc.12",
     "langchain": "^0.0.214",
     "openai": "^4.24.1"
   }
