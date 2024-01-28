@@ -5,7 +5,7 @@
 - prdBrand: '바이탈뷰티',
 - prdPrice: '28,000',
 - prdSalePrice: '22,400 ~',
-- prdCategroy: '슬리밍/이너뷰티'
+- prdCategory: '슬리밍/이너뷰티'
 
 ## 상품정보 제공고시
 - 제품명: 바이탈뷰티 슈퍼레티놀C 30포

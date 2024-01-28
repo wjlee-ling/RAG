@@ -6,7 +6,7 @@
 - prdBrand: '푸드올로지'
 - prdPrice: '22,900'
 - prdSalePrice: '17,400 ~'
-- prdCategroy: '슬리밍/이너뷰티'
+- prdCategory: '슬리밍/이너뷰티'
 
 ## 상품정보 제공고시
 

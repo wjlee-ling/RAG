@@ -6,7 +6,7 @@
 - prdBrand: '피토틱스',
 - prdPrice: '19,500',
 - prdSalePrice: '18,900',
-- prdCategroy: '유산균'
+- prdCategory: '유산균'
 
 ## 상품정보 제공고시
 

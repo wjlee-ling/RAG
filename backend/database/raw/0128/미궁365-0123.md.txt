@@ -6,7 +6,7 @@
 - prdBrand: '미궁365'
 - prdPrice: '19,900'
 - prdSalePrice: '17,000'
-- prdCategroy: '슬리밍/이너뷰티'
+- prdCategory: '슬리밍/이너뷰티'
 
 ## 상품정보 제공고시
 

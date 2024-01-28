@@ -5,7 +5,7 @@
 - prdBrand: '에버콜라겐',
 - prdPrice: null,
 - prdSalePrice: '29,000',
-- prdCategroy: '슬리밍/이너뷰티'
+- prdCategory: '슬리밍/이너뷰티'
 
 ## 상품정보 제공고시
 - 제품명: 에버콜라겐 인앤업플러스 30정 (15일분)

@@ -6,7 +6,7 @@
 - prdBrand: '마그랩'
 - prdPrice: '39,000'
 - prdSalePrice: '28,410'
-- prdCategroy: '비타민'
+- prdCategory: '비타민'
 
 ## 상품정보 제공고시
 

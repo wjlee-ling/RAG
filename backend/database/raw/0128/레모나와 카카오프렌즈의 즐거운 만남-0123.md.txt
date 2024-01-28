@@ -7,7 +7,7 @@
 - prdBrand: '레모나'
 - prdPrice: '19,800'
 - prdSalePrice: '13,320'
-- prdCategroy: '비타민'
+- prdCategory: '비타민'
 
 ## 상품정보 제공고시
 
