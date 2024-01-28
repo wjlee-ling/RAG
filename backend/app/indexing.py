@@ -4,8 +4,10 @@ from langchain.text_splitter import (
     RecursiveCharacterTextSplitter,
     MarkdownHeaderTextSplitter,
 )
+from langchain_community.vectorstores import Chroma
+from langchain_openai import OpenAIEmbeddings
 
-
+## loading and chunking
 loader = DirectoryLoader(
     "../database/",
     glob="**/*.md.txt",
@@ -19,6 +21,20 @@ splitter = RecursiveCharacterTextSplitter(
     separators=["#{2,5}", "\n---+\n+", "\n\n+"],
     keep_separator=True,
     is_separator_regex=True,
+    add_start_index=True,
 )
 
-# chunks = splitter.split_documents([docs[0]])
+chunks = splitter.split_documents(docs)
+# print(chunks)
+
+## vectorization
+vs = Chroma.from_documents(
+    documents=chunks,
+    embedding=OpenAIEmbeddings(),
+    persist_directory="../database/vectorstore/chroma",
+    collection_name="test",
+    collection_metadata={
+        "hnsw:space": "cosine",
+    },
+)
+# collection = vs._collection  ## the collection "test"
