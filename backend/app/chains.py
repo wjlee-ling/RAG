@@ -13,7 +13,9 @@ from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 
 
-def build_conversational_retrieval_chain(retrieval_prompt=retrieval_prompt) -> Dict:
+def build_conversational_retrieval_chain(user_retrieval_prompt=None) -> Dict:
+    if user_retrieval_prompt is None:
+        user_retrieval_prompt = retrieval_prompt
     persistent_client = chromadb.PersistentClient(
         "/home/onejelly/workspace/prompt-engineering/backend/database/vectorstore/chroma"
     )
@@ -47,7 +49,7 @@ def build_conversational_retrieval_chain(retrieval_prompt=retrieval_prompt) -> D
     }
 
     answer = {
-        "answer": final_inputs | retrieval_prompt | llm,
+        "answer": final_inputs | user_retrieval_prompt | llm,
         "docs": itemgetter("docs"),
     }
 
@@ -83,13 +85,13 @@ def build_conversational_retrieval_chain(retrieval_prompt=retrieval_prompt) -> D
 # conversational_retrieval_chain = inputs | retrieved_docs | answer
 
 # print(conversational_retrieval_chain.get_prompts())
-conversational_retrieval_chain = build_conversational_retrieval_chain()
-resp = conversational_retrieval_chain.invoke(
-    {
-        "question": "미궁365 보관 방법은?",
-        "chat_history": [],
-    }
-)
-print(resp["answer"])
+# conversational_retrieval_chain = build_conversational_retrieval_chain()
+# resp = conversational_retrieval_chain.invoke(
+#     {
+#         "question": "미궁365 보관 방법은?",
+#         "chat_history": [],
+#     }
+# )
+# print(resp["answer"])
 # for doc in resp["docs"]:
 # print(doc)

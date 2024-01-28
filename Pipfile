@@ -10,6 +10,7 @@ langchain-community = "*"
 langchain-openai = "*"
 chromadb = "*"
 wandb = "*"
+streamlit = "*"
 
 [dev-packages]
 
