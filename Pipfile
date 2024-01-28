@@ -6,6 +6,10 @@ name = "pypi"
 [packages]
 fastapi = "*"
 langchain = "*"
+langchain-community = "*"
+langchain-openai = "*"
+chromadb = "*"
+wandb = "*"
 
 [dev-packages]
 
