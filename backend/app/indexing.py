@@ -21,7 +21,7 @@ def add_to_metadata(docs: Iterable[Document]) -> Iterable[Document]:
         "prdBrand": "브랜드",
         "prdPrice": "정가",
         "prdSalePrice": "판매가",
-        "prdCategroy": "분류",
+        "prdCategory": "분류",
     }
 
     for doc in docs:
@@ -31,9 +31,18 @@ def add_to_metadata(docs: Iterable[Document]) -> Iterable[Document]:
         matches = re.findall(pattern, text_prd)
         new_metadata = {}
         for match in matches:
-            new_metadata[mapping[match[0]]] = match[1].strip(",'")
+            if match[0] in ["prdPrice", "prdSalePrice"]:
+                try:
+                    new_metadata[mapping[match[0]]] = int(
+                        match[1].strip("원,'~ ").replace(",", "")
+                    )
+                except:
+                    new_metadata["정가"] = None
+            else:
+                new_metadata[mapping[match[0]]] = match[1].strip(",' ")
+        if new_metadata["정가"] is None:  #  no sale
+            new_metadata["정가"] = new_metadata["판매가"]
         doc.metadata.update(new_metadata)
-
     return docs
 
 
@@ -44,11 +53,11 @@ loader = DirectoryLoader(
     loader_cls=TextLoader,
 )
 docs = loader.load()
-docs = add_to_metadata(docs[:3])
+docs = add_to_metadata(docs)
 
 splitter = RecursiveCharacterTextSplitter(
-    chunk_size=500,
-    chunk_overlap=50,
+    chunk_size=1500,  # gpt-4-0125-preview: 128,000 tokens
+    chunk_overlap=150,
     separators=["#{2,5}", "\n---+\n+", "\n\n+"],
     keep_separator=True,
     is_separator_regex=True,
@@ -63,9 +72,14 @@ vs = Chroma.from_documents(
     documents=chunks,
     embedding=OpenAIEmbeddings(),
     persist_directory="../database/vectorstore/chroma",
-    collection_name="test",
+    ids=[str(i) for i in range(1, len(chunks) + 1)],
+    collection_name="test-0128",
     collection_metadata={
         "hnsw:space": "cosine",
     },
 )
-# collection = vs._collection  ## the collection "test"
+print(f"💥New collection made w/ {vs._collection.count()} document(s).")
+
+## to use
+# persistent_client = chromadb.PersistentClient()
+# collection = persistent_client.get_or_create_collection("collection_name")
