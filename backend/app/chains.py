@@ -1,8 +1,7 @@
-import chromadb
-
 from .templates import retrieval_prompt, condense_question_prompt, combine_docs
 from operator import itemgetter
 from typing import Dict
+
 from langchain_openai import ChatOpenAI
 from langchain.schema import format_document
 from langchain_core.messages import AIMessage, HumanMessage, get_buffer_string
@@ -16,18 +15,16 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 def build_conversational_retrieval_chain(user_retrieval_prompt=None) -> Dict:
     if user_retrieval_prompt is None:
         user_retrieval_prompt = retrieval_prompt
-    persistent_client = chromadb.PersistentClient(
-        "/home/onejelly/workspace/prompt-engineering/backend/database/vectorstore/chroma"
-    )
+    # persistent_client = chromadb.PersistentClient("backend/database/vectorstore/chroma")
     vectorstore = Chroma(
-        client=persistent_client,
-        collection_name="test-0128",
+        persist_directory="backend/database/vectorstore/chroma",
+        # client=persistent_client,
+        collection_name="test-0129",
         embedding_function=OpenAIEmbeddings(),
     )
+    print(f"💥Collection found w/ {vectorstore._collection.count()} document(s).")
     retriever = vectorstore.as_retriever()
-    llm = ChatOpenAI(
-        model_name="gpt-4-0125-preview", temperature=0, max_tokens=200, verbose=True
-    )
+    llm = ChatOpenAI(model_name="gpt-4-0125-preview", temperature=0, verbose=True)
 
     inputs = RunnableParallel(
         standalone_question=RunnablePassthrough.assign(

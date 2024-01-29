@@ -48,7 +48,7 @@ def add_to_metadata(docs: Iterable[Document]) -> Iterable[Document]:
 
 ## loading and chunking
 loader = DirectoryLoader(
-    "../database/",
+    "backend/database/raw/0128/",
     glob="**/*.md.txt",
     loader_cls=TextLoader,
 )
@@ -56,7 +56,7 @@ docs = loader.load()
 docs = add_to_metadata(docs)
 
 splitter = RecursiveCharacterTextSplitter(
-    chunk_size=1500,  # gpt-4-0125-preview: 128,000 tokens
+    chunk_size=5000,  # gpt-4-0125-preview: 128,000 tokens
     chunk_overlap=150,
     separators=["#{2,5}", "\n---+\n+", "\n\n+"],
     keep_separator=True,
@@ -71,9 +71,9 @@ chunks = splitter.split_documents(docs)
 vs = Chroma.from_documents(
     documents=chunks,
     embedding=OpenAIEmbeddings(),
-    persist_directory="../database/vectorstore/chroma",
+    persist_directory="backend/database/vectorstore/chroma",
     ids=[str(i) for i in range(1, len(chunks) + 1)],
-    collection_name="test-0128",
+    collection_name="test-0129",
     collection_metadata={
         "hnsw:space": "cosine",
     },
