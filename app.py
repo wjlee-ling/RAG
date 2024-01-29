@@ -1,4 +1,4 @@
-from backend.app.chains import build_conversational_retrieval_chain
+from backend.app.chains import build_conversational_retrieval_chain, build_sales_chain
 
 import os
 import sys
@@ -17,6 +17,7 @@ if "messages" not in sst:
     sst.messages = []
 if "custom_retrieval_prompt_template" not in sst:
     sst.custom_retrieval_prompt_template = None
+
 # os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 wandb.init(entity="wjlee-ling", project="sal-test")
 
@@ -28,6 +29,12 @@ def get_conversational_retrieval_chain(retrieval_prompt_template):
         retrieval_prompt_template
     )
     return conversational_retrieval_chain
+
+
+@st.cache_resource
+def get_sales_chain(sales_prompt_template=None):
+    print("☑️ Building a new sales chain...")
+    return build_sales_chain(sales_prompt_template)
 
 
 def reset():
@@ -68,6 +75,7 @@ if prompt := st.chat_input("안녕하세요. 저는 Sales Bot입니다. 무엇�
     sst.conversational_retrieval_chain = get_conversational_retrieval_chain(
         sst.custom_retrieval_prompt_template
     )
+    sst.sales_chain = get_sales_chain()
 
     # Display user message in chat message container
     with st.chat_message("human"):
@@ -80,25 +88,38 @@ if prompt := st.chat_input("안녕하세요. 저는 Sales Bot입니다. 무엇�
     # Get assistant response
     print(sst.messages)
     with wandb_tracing_enabled():
+        # step 1
         response = sst.conversational_retrieval_chain.invoke(
             {
                 "question": prompt,
                 "chat_history": sst.messages,
             }
         )
-    answer = response["answer"].content
-    docs = response["docs"]
+        retrieval_answer = response["answer"].content
+        retrieval_docs = response["docs"]
+        # step 2
+        final_response = sst.sales_chain.invoke(
+            {
+                "question": HumanMessage(content=prompt),
+                "context": retrieval_answer,
+            }
+        )
+        print(final_response)
+
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
-        st.markdown(answer)
+        st.markdown(final_response.content)
         sst.messages.append(
-            AIMessage(content=answer)
+            final_response  # AIMessage(content=answer)
         )  # sst.messages.append({"role": "assistant", "content": answer})
 
         with st.expander("정보 검색 결과"):
-            tabs = st.tabs([f"doc{i}" for i in range(len(docs))])
-            for i in range(len(docs)):
-                tabs[i].write(docs[i].page_content)
-                tabs[i].write(docs[i].metadata)
-            # for doc in docs:
+            st.markdown(retrieval_answer)
+
+        with st.expander("정보 검색시 참고한 chunk"):
+            tabs = st.tabs([f"doc{i}" for i in range(len(retrieval_docs))])
+            for i in range(len(retrieval_docs)):
+                tabs[i].write(retrieval_docs[i].page_content)
+                tabs[i].write(retrieval_docs[i].metadata)
+            # for doc in retrieval_docs:
             #     st.markdown(doc.page_content)

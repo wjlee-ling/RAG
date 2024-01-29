@@ -28,7 +28,7 @@ def build_conversational_retrieval_chain(user_retrieval_prompt=None) -> Dict:
         embedding_function=OpenAIEmbeddings(),
     )
     print(f"💥Collection found w/ {vectorstore._collection.count()} document(s).")
-    retriever = vectorstore.as_retriever()
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 5})
     llm = ChatOpenAI(model_name="gpt-4-0125-preview", temperature=0, verbose=True)
 
     inputs = RunnableParallel(
