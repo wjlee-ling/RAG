@@ -4,6 +4,7 @@ import streamlit as st
 from streamlit import session_state as sst
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_community.callbacks import wandb_tracing_enabled
 
 if "messages" not in sst:
     sst.messages = []
@@ -73,12 +74,13 @@ if prompt := st.chat_input("안녕하세요. 저는 Sales Bot입니다. 무엇�
 
     # Get assistant response
     print(sst.messages)
-    response = sst.conversational_retrieval_chain.invoke(
-        {
-            "question": prompt,
-            "chat_history": sst.messages,
-        }
-    )
+    with wandb_tracing_enabled():
+        response = sst.conversational_retrieval_chain.invoke(
+            {
+                "question": prompt,
+                "chat_history": sst.messages,
+            }
+        )
     answer = response["answer"].content
     docs = response["docs"]
     # Display assistant response in chat message container
@@ -89,5 +91,8 @@ if prompt := st.chat_input("안녕하세요. 저는 Sales Bot입니다. 무엇�
         )  # sst.messages.append({"role": "assistant", "content": answer})
 
         with st.expander("정보 검색 결과"):
-            for doc in docs:
-                st.info(doc)
+            tabs = st.tabs([f"doc{i}" for i in range(len(docs))])
+            for i in range(len(docs)):
+                tabs[i].write(docs[i].page_content)
+            # for doc in docs:
+            #     st.markdown(doc.page_content)
