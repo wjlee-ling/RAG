@@ -1,4 +1,9 @@
-from .templates import retrieval_prompt, condense_question_prompt, combine_docs
+from .templates import (
+    RETRIEVAL_PROMPT,
+    SALES_PROMPT,
+    CONDENSE_QUESTION_PROMPT,
+    combine_docs,
+)
 from operator import itemgetter
 from typing import Dict
 
@@ -14,7 +19,7 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 
 def build_conversational_retrieval_chain(user_retrieval_prompt=None) -> Dict:
     if user_retrieval_prompt is None:
-        user_retrieval_prompt = retrieval_prompt
+        user_retrieval_prompt = RETRIEVAL_PROMPT
     # persistent_client = chromadb.PersistentClient("backend/database/vectorstore/chroma")
     vectorstore = Chroma(
         persist_directory="backend/database/vectorstore/chroma",
@@ -30,7 +35,7 @@ def build_conversational_retrieval_chain(user_retrieval_prompt=None) -> Dict:
         standalone_question=RunnablePassthrough.assign(
             chat_history=lambda x: get_buffer_string(x["chat_history"])
         )
-        | condense_question_prompt
+        | CONDENSE_QUESTION_PROMPT
         | ChatOpenAI(model_name="gpt-3.5-turbo-1106", temperature=0)
         | StrOutputParser()
     )
@@ -54,11 +59,18 @@ def build_conversational_retrieval_chain(user_retrieval_prompt=None) -> Dict:
     return conversational_retrieval_chain
 
 
+def build_sales_chain(sales_prompt=None):
+    _sales_prompt = sales_prompt or SALES_PROMPT
+    llm = ChatOpenAI(model_name="gpt-4-0125-preview", temperature=0.3, verbose=True)
+    sales_chain = _sales_prompt | llm
+    return sales_chain
+
+
 # inputs = RunnableParallel(
 #     standalone_question=RunnablePassthrough.assign(
 #         chat_history=lambda x: get_buffer_string(x["chat_history"])
 #     )
-#     | condense_question_prompt
+#     | CONDENSE_QUESTION_PROMPT
 #     | ChatOpenAI(model_name="gpt-3.5-turbo-1106", temperature=0)
 #     | StrOutputParser()
 # )
