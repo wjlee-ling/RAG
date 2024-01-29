@@ -97,5 +97,6 @@ if prompt := st.chat_input("안녕하세요. 저는 Sales Bot입니다. 무엇�
             tabs = st.tabs([f"doc{i}" for i in range(len(docs))])
             for i in range(len(docs)):
                 tabs[i].write(docs[i].page_content)
+                tabs[i].write(docs[i].metadata)
             # for doc in docs:
             #     st.markdown(doc.page_content)
