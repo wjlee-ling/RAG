@@ -1,11 +1,16 @@
 from backend.app.chains import build_conversational_retrieval_chain
 
 import os
+import sys
 import streamlit as st
 from streamlit import session_state as sst
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_community.callbacks import wandb_tracing_enabled
+
+__import__("pysqlite3")
+if "pysqlite3" in sys.modules:
+    sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 
 if "messages" not in sst:
     sst.messages = []
