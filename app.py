@@ -8,15 +8,15 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_community.callbacks import wandb_tracing_enabled
 
-# __import__("pysqlite3")
-# if "pysqlite3" in sys.modules:
-#     sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
+__import__("pysqlite3")
+if "pysqlite3" in sys.modules:
+    sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
 
 if "messages" not in sst:
     sst.messages = []
 if "custom_retrieval_prompt_template" not in sst:
     sst.custom_retrieval_prompt_template = None
-os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
+# os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 
 
 @st.cache_resource

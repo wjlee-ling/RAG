@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "ed0375c9a753d1031db40a2d553c16b2cce582a799ed004a878662c7cead13eb"
+            "sha256": "8b53d89ede1a302b8024a6a5538b1832b2334309e651b72336b6a948bf1f8625"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -885,11 +885,11 @@
         },
         "langsmith": {
             "hashes": [
-                "sha256:94427846b334ad9bdbec3266fee12903fe9f5448f628667689d0412012aaf392",
-                "sha256:a5bb7ac58c19a415a9d5f51db56dd32ee2cd7343a00825bbc2018312eb3d122a"
+                "sha256:9ae1ab777018e2174f68e8f53c88e7a7feb8dbf1c458b473644a3d5e22dc1eb7",
+                "sha256:dd163f89bca14c86759c651a72917c6d45f7dd18435d7bc65dc205a23dd9ec8d"
             ],
             "markers": "python_version < '4.0' and python_full_version >= '3.8.1'",
-            "version": "==0.0.83"
+            "version": "==0.0.84"
         },
         "markdown-it-py": {
             "hashes": [
@@ -1481,7 +1481,7 @@
                 "sha256:fc381d1dd0516343f1440019cedf08a7405f791cd49eef4ae1ea06520bc1c020",
                 "sha256:fe599e175cb347efc8ee524bcd4b902d11f7262c0e569ececcb89995c15f0a5e"
             ],
-            "markers": "python_version >= '3.8'",
+            "markers": "python_version >= '3.10' and sys_platform == 'linux'",
             "version": "==4.25.2"
         },
         "psutil": {
@@ -1747,6 +1747,19 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==1.0.0"
+        },
+        "pysqlite3-binary": {
+            "hashes": [
+                "sha256:2fe1d8c9b1c992cff3cf54ea33f00face82343de9c6a03f8a914679550d2d379",
+                "sha256:4950fe4fbf6f21ce6bed5cf9bb44f04d56f9442cea9f513e67d5f627651d2737",
+                "sha256:6048cdf4473f9186e93cf58b84c6e4f191d64050e3d6a00737a7df2310eb2f5f",
+                "sha256:674bb5fe16beb289eb2560f12055548cf0e496eee93f7f4cdd84276d03b7d541",
+                "sha256:82a2a0972ebb29736ef1536cc025f0a2795a6a74140d070630a24083422cd376",
+                "sha256:9e3535276d490b60d4f1cb1bace7613afc90333f2b37ce76bffb21d09032eccb",
+                "sha256:b5e42f0c706e69bce24bb7a2de78985ec7589a4b6e1c719668c9d42350f49ed1"
+            ],
+            "index": "pypi",
+            "version": "==0.5.2.post3"
         },
         "python-dateutil": {
             "hashes": [
