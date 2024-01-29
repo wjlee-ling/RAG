@@ -2,6 +2,7 @@ from backend.app.chains import build_conversational_retrieval_chain
 
 import os
 import sys
+import wandb
 import streamlit as st
 from streamlit import session_state as sst
 from langchain_core.prompts import ChatPromptTemplate
@@ -17,6 +18,7 @@ if "messages" not in sst:
 if "custom_retrieval_prompt_template" not in sst:
     sst.custom_retrieval_prompt_template = None
 # os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
+wandb.init(entity="wjlee-ling", project="sal-test")
 
 
 @st.cache_resource
