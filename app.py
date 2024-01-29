@@ -1,5 +1,6 @@
 from backend.app.chains import build_conversational_retrieval_chain
 
+import os
 import streamlit as st
 from streamlit import session_state as sst
 from langchain_core.prompts import ChatPromptTemplate
@@ -10,10 +11,7 @@ if "messages" not in sst:
     sst.messages = []
 if "custom_retrieval_prompt_template" not in sst:
     sst.custom_retrieval_prompt_template = None
-# if "bot_img" not in sst:
-#     sst.bot_img = st.image(
-#         "https://github.com/wjlee-ling/streamlit/assets/61496071/2c5836a3-666b-47bd-9165-36ab10de76bb"
-#     )
+os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
 
 
 @st.cache_resource
