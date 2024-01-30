@@ -46,6 +46,19 @@ def add_to_metadata(docs: Iterable[Document]) -> Iterable[Document]:
     return docs
 
 
+def append_metadata_to_data(docs: Iterable[Document]) -> Iterable[Document]:
+    """chunk에 메타데이터로 들어가 있는 제품정보 추가"""
+    import json
+
+    for doc in docs:
+        if "## 판매 정보" not in doc.page_content:
+            metadata_str = json.dumps(doc.metadata, ensure_ascii=False)
+            doc.page_content = (
+                "## 판매 정보\n" + metadata_str + "\n---\n\n" + doc.page_content
+            )
+    return docs
+
+
 ## loading and chunking
 loader = DirectoryLoader(
     "backend/database/raw/0128/",
@@ -56,7 +69,7 @@ docs = loader.load()
 docs = add_to_metadata(docs)
 
 splitter = RecursiveCharacterTextSplitter(
-    chunk_size=5000,  # gpt-4-0125-preview: 128,000 tokens
+    chunk_size=1000,  # gpt-4-0125-preview: 128,000 tokens
     chunk_overlap=150,
     separators=["#{2,5}", "\n---+\n+", "\n\n+"],
     keep_separator=True,
@@ -65,15 +78,16 @@ splitter = RecursiveCharacterTextSplitter(
 )
 
 chunks = splitter.split_documents(docs)
+chunks = append_metadata_to_data(chunks)
 # print(chunks)
 
-## vectorization
+# vectorization
 vs = Chroma.from_documents(
     documents=chunks,
     embedding=OpenAIEmbeddings(),
     persist_directory="backend/database/vectorstore/chroma",
     ids=[str(i) for i in range(1, len(chunks) + 1)],
-    collection_name="test-0129",
+    collection_name="test-0131",
     collection_metadata={
         "hnsw:space": "cosine",
     },
