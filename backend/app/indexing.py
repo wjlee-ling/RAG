@@ -17,11 +17,11 @@ def add_to_metadata(docs: Iterable[Document]) -> Iterable[Document]:
 
     pattern = r"- (\w+): (.+)"
     mapping = {
-        "prdDisplayName": "상품명",
-        "prdBrand": "브랜드",
-        "prdPrice": "정가",
-        "prdSalePrice": "판매가",
-        "prdCategory": "분류",
+        "prdDisplayName": "name",  # "상품명",
+        "prdBrand": "brand",  # "브랜드",
+        "prdPrice": "price",  # "정가",
+        "prdSalePrice": "sale-price",  # "판매가",
+        "prdCategory": "category",  # "분류",
     }
 
     for doc in docs:
@@ -37,11 +37,11 @@ def add_to_metadata(docs: Iterable[Document]) -> Iterable[Document]:
                         match[1].strip("원,'~ ").replace(",", "")
                     )
                 except:
-                    new_metadata["정가"] = None
+                    new_metadata[mapping["prdPrice"]] = None
             else:
                 new_metadata[mapping[match[0]]] = match[1].strip(",' ")
-        if new_metadata["정가"] is None:  #  no sale
-            new_metadata["정가"] = new_metadata["판매가"]
+        if new_metadata[mapping["prdPrice"]] is None:  #  no sale
+            new_metadata[mapping["prdPrice"]] = new_metadata[mapping["prdSalePrice"]]
         doc.metadata.update(new_metadata)
     return docs
 
@@ -69,7 +69,7 @@ docs = loader.load()
 docs = add_to_metadata(docs)
 
 splitter = RecursiveCharacterTextSplitter(
-    chunk_size=1000,  # gpt-4-0125-preview: 128,000 tokens
+    chunk_size=5000,  # 5000 for gpt-4-0125-preview: 128,000 tokens
     chunk_overlap=150,
     separators=["#{2,5}", "\n---+\n+", "\n\n+"],
     keep_separator=True,
@@ -87,7 +87,7 @@ vs = Chroma.from_documents(
     embedding=OpenAIEmbeddings(),
     persist_directory="backend/database/vectorstore/chroma",
     ids=[str(i) for i in range(1, len(chunks) + 1)],
-    collection_name="test-0131",
+    collection_name="test-0131-eng",
     collection_metadata={
         "hnsw:space": "cosine",
     },

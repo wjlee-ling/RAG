@@ -125,3 +125,146 @@ sales_template = """
 [답변]
 """
 SALES_PROMPT = ChatPromptTemplate.from_template(sales_template)
+
+# Self-query tests
+self_query_template = """Your goal is to structure the user's query to match the request schema provided below.
+
+<< Structured Request Schema >>
+When responding use a markdown code snippet with a JSON object formatted in the following schema:
+
+```json
+{
+    "query": string \ text string to compare to document contents
+    "filter": string \ logical condition statement for filtering documents
+    "intent" string \ intent of the query
+}
+```
+
+The query string should contain only text that is expected to match the contents of documents. Any conditions in the filter should not be mentioned in the query as well.
+
+A logical condition statement is composed of one or more comparison and logical operation statements.
+
+A comparison statement takes the form: `comp(attr, val)`:
+- `comp` (eq | ne | gt | gte | lt | lte | contain | like | in | nin): comparator
+- `attr` (string):  name of attribute to apply the comparison to
+- `val` (string): is the comparison value
+
+A logical operation statement takes the form `op(statement1, statement2, ...)`:
+- `op` (and | or | not): logical operator
+- `statement1`, `statement2`, ... (comparison statements or logical operation statements): one or more statements to apply the operation to
+
+Make sure that you only use the comparators and logical operators listed above and no others.
+Make sure that filters only refer to attributes that exist in the data source.
+Make sure that filters only use the attributed names with its function names if there are functions applied on them.
+Make sure that filters only use format `YYYY-MM-DD` when handling date data typed values.
+Make sure that filters take into account the descriptions of attributes and only make comparisons that are feasible given the type of data being stored.
+Make sure that filters are only used as needed. If there are no filters that should be applied return "NO_FILTER" for the filter value.
+Make sure that filters are only used as needed. If there are no filters that should be applied return "NO_FILTER" for the filter value.
+Make sure that intents are only used as needed. If there are no intents that should be applied return "NO_FILTER" for the intent value.
+
+
+<< Example 1. >>
+Data Source:
+```json
+{
+    "content": "Lyrics of a song",
+    "attributes": {
+        "artist": {
+            "type": "string",
+            "description": "Name of the song artist"
+        },
+        "length": {
+            "type": "integer",
+            "description": "Length of the song in seconds"
+        },
+        "genre": {
+            "type": "string",
+            "description": "The song genre, one of "pop", "rock" or "rap""
+        }
+    }
+}
+```
+
+User Query:
+What are songs by Taylor Swift or Katy Perry about teenage romance under 3 minutes long in the dance pop genre
+
+Structured Request:
+```json
+{
+    "query": "teenager love",
+    "filter": "and(or(eq(\"artist\", \"Taylor Swift\"), eq(\"artist\", \"Katy Perry\")), lt(\"length\", 180), eq(\"genre\", \"pop\"))"
+}
+```
+
+
+<< Example 2. >>
+Data Source:
+```json
+{
+    "content": "Lyrics of a song",
+    "attributes": {
+        "artist": {
+            "type": "string",
+            "description": "Name of the song artist"
+        },
+        "length": {
+            "type": "integer",
+            "description": "Length of the song in seconds"
+        },
+        "genre": {
+            "type": "string",
+            "description": "The song genre, one of "pop", "rock" or "rap""
+        }
+    }
+}
+```
+
+User Query:
+What are songs that were not published on Spotify
+
+Structured Request:
+```json
+{
+    "query": "",
+    "filter": "NO_FILTER"
+}
+```
+
+
+<< Example 3. >>
+Data Source:
+```json
+{
+    "content": "비타민, 유산균, 슬리밍/이너뷰티 제품 **판매** 정보",
+    "attributes": {
+    "분류": {
+        "description": "제품의 카데고리 분류. ['비타민', '유산균', '슬리밍/이너뷰티'] 중 하나",
+        "type": "string"
+    },
+    "정가": {
+        "description": "제품의 정가",
+        "type": "integer"
+    },
+    "판매가": {
+        "description": "제품의 판매가. 정가와 다를 경우 세일이 들어가는 것으로 간주",
+        "type": "integer"
+    },
+    "상품명": {
+        "description": "제품의 상품명",
+        "type": "string"
+    },
+    "브랜드": {
+        "description": "제품의 브랜드",
+        "type": "string"
+    }
+}
+}
+```
+
+User Query:
+
+{query}
+
+Structured Request:
+"""
+SELF_QUERY_PROMPT = ChatPromptTemplate.from_template(self_query_template)
