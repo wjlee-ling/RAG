@@ -97,6 +97,13 @@ if prompt := st.chat_input("안녕하세요. 저는 Sales Bot입니다. 무엇�
         )
         retrieval_answer = response["answer"].content
         retrieval_docs = response["docs"]
+        # step 2
+        final_response = sst.sales_chain.invoke(
+            {
+                "question": HumanMessage(content=prompt),
+                "context": retrieval_answer,
+            }
+        )
 
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
