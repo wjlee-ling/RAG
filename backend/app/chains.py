@@ -50,18 +50,18 @@ def build_conversational_retrieval_chain(
 
     retrieved_docs = {
         "docs": itemgetter("standalone_question") | retriever,
-        "standalone_question": lambda x: x["standalone_question"],
+        "question": lambda x: x["standalone_question"],
     }
 
     final_inputs = {
         "context": lambda x: combine_docs(x["docs"]),
-        "standalone_question": itemgetter("standalone_question"),
+        "question": itemgetter("question"),
     }
 
     answer = {
         "answer": final_inputs | user_retrieval_prompt | llm,
         "docs": itemgetter("docs"),
-        "standalone_question": itemgetter("standalone_question"),
+        "standalone_question": itemgetter("question"),
     }
 
     conversational_retrieval_chain = inputs | retrieved_docs | answer
