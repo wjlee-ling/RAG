@@ -17,14 +17,22 @@ from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 
 
-def build_conversational_retrieval_chain(user_retrieval_prompt=None) -> Dict:
+def build_conversational_retrieval_chain(
+    collection_name,
+    user_retrieval_prompt=None,
+) -> Dict:
+    """
+    Args:
+        - collection_name: vectorstore로 사용할 collection 이름
+        - user_retrieval_prompt: custom retrieval prompt template
+    """
     if user_retrieval_prompt is None:
         user_retrieval_prompt = RETRIEVAL_PROMPT
     # persistent_client = chromadb.PersistentClient("backend/database/vectorstore/chroma")
     vectorstore = Chroma(
         persist_directory="backend/database/vectorstore/chroma",
         # client=persistent_client,
-        collection_name="test-0129",
+        collection_name=collection_name,
         embedding_function=OpenAIEmbeddings(),
     )
     print(f"💥Collection found w/ {vectorstore._collection.count()} document(s).")
@@ -42,17 +50,18 @@ def build_conversational_retrieval_chain(user_retrieval_prompt=None) -> Dict:
 
     retrieved_docs = {
         "docs": itemgetter("standalone_question") | retriever,
-        "question": lambda x: x["standalone_question"],
+        "standalone_question": lambda x: x["standalone_question"],
     }
 
     final_inputs = {
         "context": lambda x: combine_docs(x["docs"]),
-        "question": itemgetter("question"),
+        "standalone_question": itemgetter("standalone_question"),
     }
 
     answer = {
         "answer": final_inputs | user_retrieval_prompt | llm,
         "docs": itemgetter("docs"),
+        "standalone_question": itemgetter("standalone_question"),
     }
 
     conversational_retrieval_chain = inputs | retrieved_docs | answer

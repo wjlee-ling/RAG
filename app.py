@@ -23,10 +23,10 @@ wandb.init(entity="wjlee-ling", project="sal-test")
 
 
 @st.cache_resource
-def get_conversational_retrieval_chain(retrieval_prompt_template):
+def get_conversational_retrieval_chain(collection_name, retrieval_prompt_template):
     print("☑️ Building a new conversational retrieval chain...")
     conversational_retrieval_chain = build_conversational_retrieval_chain(
-        retrieval_prompt_template
+        collection_name, retrieval_prompt_template
     )
     return conversational_retrieval_chain
 
@@ -73,7 +73,7 @@ for message in sst.messages:
 
 if prompt := st.chat_input("안녕하세요. 저는 Sales Bot입니다. 무엇을 도와드릴까요?"):
     sst.conversational_retrieval_chain = get_conversational_retrieval_chain(
-        sst.custom_retrieval_prompt_template
+        "test-0128", sst.custom_retrieval_prompt_template
     )
     sst.sales_chain = get_sales_chain()
 
@@ -97,14 +97,6 @@ if prompt := st.chat_input("안녕하세요. 저는 Sales Bot입니다. 무엇�
         )
         retrieval_answer = response["answer"].content
         retrieval_docs = response["docs"]
-        # step 2
-        final_response = sst.sales_chain.invoke(
-            {
-                "question": HumanMessage(content=prompt),
-                "context": retrieval_answer,
-            }
-        )
-        print(final_response)
 
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
