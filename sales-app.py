@@ -53,7 +53,7 @@ if "messages" not in sst:
 
 st.title("ㅌ넷 세일즈봇 대화 평가")
 with st.sidebar:
-    sst.user_name = st.text_input("필수: 닉네임을 입력해주세요.")
+    sst.user_name = st.text_input("필수: 닉네임을 입력해주세요. [:red 다섯 음절 이상]")
 
 with st.expander("가이드라인", expanded=True if len(sst.messages) == 0 else False):
     st.markdown(
@@ -155,8 +155,11 @@ if prompt := st.chat_input(""):
         )
 
     if len(sst.messages) >= 10:
-        st.download_button(
-            label="테스트 종료 및 txt 파일 저장",
-            data="\n".join([msg + " --> " + str(ch) for (msg, ch) in sst.checked]),
-            file_name="my_file.txt",
-        )
+        if len(sst.user_name) >= 3:
+            st.download_button(
+                label="테스트 종료 및 txt 파일 저장",
+                data="\n".join([msg + " --> " + str(ch) for (msg, ch) in sst.checked]),
+                file_name="my_file.txt",
+            )
+        else:
+            st.write("옆에서 유저 닉네임을 입력하세요")
