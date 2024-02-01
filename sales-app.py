@@ -49,8 +49,12 @@ if "messages" not in sst:
     sst.conversational_chain = get_conversational_chain(sst.condense_llm)
     sst.sales_chain = get_sales_chain(TEST_0131_PROMPT)
     sst.checked = []
+    sst.user_name = ""
 
 st.title("ㅌ넷 세일즈봇 대화 평가")
+with st.sidebar:
+    sst.user_name = st.text_input("필수: 닉네임을 입력해주세요.")
+
 with st.expander("가이드라인", expanded=True if len(sst.messages) == 0 else False):
     st.markdown(
         """\
@@ -106,7 +110,7 @@ if prompt := st.chat_input(""):
     # Display user message in chat message container
     with st.chat_message("human"):
         st.markdown(prompt)
-        sst.checked.append([prompt, False])
+        sst.checked.append(["유저: " + prompt, False])
 
     # Get assistant response
     print(sst.messages)
@@ -142,7 +146,7 @@ if prompt := st.chat_input(""):
     sst.messages.append(
         AIMessage(content=full_resp)
     )  # sst.messages.append({"role": "assistant", "content": answer})
-    sst.checked.append([full_resp, False])
+    sst.checked.append(["GPT: " + full_resp, False])
     with col_check:
         st.checkbox(
             value=False,
@@ -150,8 +154,9 @@ if prompt := st.chat_input(""):
             on_change=recheck,
         )
 
-    st.download_button(
-        label="테스트 종료 및 txt 파일 저장",
-        data="\n".join([msg + " :: " + str(ch) for (msg, ch) in sst.checked]),
-        file_name="my_file.txt",
-    )
+    if len(sst.messages) >= 10:
+        st.download_button(
+            label="테스트 종료 및 txt 파일 저장",
+            data="\n".join([msg + " --> " + str(ch) for (msg, ch) in sst.checked]),
+            file_name="my_file.txt",
+        )
