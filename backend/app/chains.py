@@ -68,6 +68,16 @@ def build_conversational_retrieval_chain(
     return conversational_retrieval_chain
 
 
+def build_conversational_chain(llm) -> Dict:
+    inputs = {
+        "chat_history": lambda x: get_buffer_string(x["chat_history"]),
+        "question": itemgetter("question"),
+    }
+
+    conversational_chain = inputs | CONDENSE_QUESTION_PROMPT | llm
+    return conversational_chain
+
+
 def build_sales_chain(sales_prompt=None):
     _sales_prompt = sales_prompt or SALES_PROMPT
     llm = ChatOpenAI(model_name="gpt-4-0125-preview", temperature=0.3, verbose=True)
