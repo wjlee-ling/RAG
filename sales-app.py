@@ -42,6 +42,7 @@ def recheck():
     print("updated!")
 
 
+NUM_TURN_LIMIT = 10
 GREETING = "안녕하세요. 무신사입니다. 찾으시는 제품이 있거나 도움이 필요하시면 말씀해 주세요."
 GUIDELINE = """\
 ### 세일즈 봇이란?
@@ -96,7 +97,8 @@ st.title("ㅌ넷 세일즈봇 대화 평가")
 # with st.sidebar:
 #     sst.user_name = st.text_input("필수: 닉네임을 입력해주세요. [:red 다섯 음절 이상]")
 def display_link_msg():
-    sst.messages.append(f"테스트가 종료되었습니다. 설문조사에 참여해주셔서 감사합니다. 설문조사 링크: {LINK}")
+    if sst.messages[-1] != "테스트가 종료되었습니다. 설문조사에 참여해주셔서 감사합니다. 설문조사 링크: {LINK}":
+        sst.messages.append(f"테스트가 종료되었습니다. 설문조사에 참여해주셔서 감사합니다. 설문조사 링크: {LINK}")
     print(sst.messages)
 
 
@@ -184,13 +186,10 @@ else:
         )  # sst.messages.append({"role": "assistant", "content": answer})
         sst.checked.append(["GPT: " + full_resp, False])
 
-    if len(sst.messages) >= 4:
+    if len(sst.messages) >= NUM_TURN_LIMIT:
         btn = st.download_button(
             label="테스트 종료 및 txt 파일 저장",
             data="\n".join([msg + " --> " + str(ch) for (msg, ch) in sst.checked]),
             file_name=f"{sst.user_name}.txt",
             on_click=display_link_msg,
         )
-        if btn:
-            sst.messages.append("test")
-            sst.checked.append(["###################", False])
