@@ -43,7 +43,9 @@ def recheck():
 
 
 NUM_TURN_LIMIT = 10
-GREETING = "안녕하세요. 무신사입니다. 찾으시는 제품이 있거나 도움이 필요하시면 말씀해 주세요."
+GREETING = (
+    "안녕하세요. 무신사입니다. 찾으시는 제품이 있거나 도움이 필요하시면 말씀해 주세요."
+)
 GUIDELINE = """\
 ### 세일즈 봇이란?
 제품 구매를 망설이는 고객에게 대화를 통해 가장 적합한 제품을 추천하고 구매를 유도한다.
@@ -97,8 +99,13 @@ st.title("ㅌ넷 세일즈봇 대화 평가")
 # with st.sidebar:
 #     sst.user_name = st.text_input("필수: 닉네임을 입력해주세요. [:red 다섯 음절 이상]")
 def display_link_msg():
-    if sst.messages[-1] != f"테스트가 종료되었습니다. 설문조사에 참여해주셔서 감사합니다. 설문조사 링크: {LINK}":
-        sst.messages.append(f"테스트가 종료되었습니다. 설문조사에 참여해주셔서 감사합니다. 설문조사 링크: {LINK}")
+    if (
+        sst.messages[-1]
+        != f"테스트가 종료되었습니다. 설문조사에 참여해주세요. 설문조사 링크: {LINK}"
+    ):
+        sst.messages.append(
+            f"테스트가 종료되었습니다. 설문조사에 참여해주세요. 설문조사 링크: {LINK}"
+        )
     print(sst.messages)
 
 
