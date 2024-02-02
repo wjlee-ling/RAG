@@ -108,8 +108,8 @@ if sst.submit is False:
         #     "질문 2. 사고 싶은 제품이 있으시다면 (질문 1에서 '예' 선택) 얼마나 사고 싶은지 점수로 얘기해주세요. (사고 싶은 마음이 클수록 높은 숫자)",
         #     options=range(1, 11),
         # )
-        if sst.question1 == "아니요":
-            sst.question2 = 1
+        # if sst.question1 == "아니요":
+        #     sst.question2 = 1
 
         st.markdown("## 가이드라인")
         st.markdown(GUIDELINE)
