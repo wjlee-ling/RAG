@@ -79,10 +79,6 @@ LINK = (
 )
 
 
-def display_link_msg():
-    st.info(f"감사합니다! 이제 다음 링크에서 설문조사를 진행해주세요: {LINK}")
-
-
 if "messages" not in sst:
     sst.messages = []  # [AIMessage(content=GREETING)]
     sst.condense_llm = get_llm("gpt-4-0125-preview")
@@ -93,8 +89,14 @@ if "messages" not in sst:
     sst.user_name = ""
 
 st.title("ㅌ넷 세일즈봇 대화 평가")
+
+
 # with st.sidebar:
 #     sst.user_name = st.text_input("필수: 닉네임을 입력해주세요. [:red 다섯 음절 이상]")
+def display_link_msg():
+    sst.messages.append(f"테스트가 종료되었습니다. 설문조사에 참여해주셔서 감사합니다. 설문조사 링크: {LINK}")
+    print(sst.messages)
+
 
 if sst.submit is False:
     with st.form("index"):
@@ -121,13 +123,16 @@ else:
         role = "human" if isinstance(message, HumanMessage) else "ai"
 
         with st.chat_message(role):
-            if role == "ai":
-                if sst.checked[i][1] == True:
-                    st.markdown(":red[" + message.content + "]")
+            try:
+                if role == "ai":
+                    if sst.checked[i][1] == True:
+                        st.markdown(":red[" + message.content + "]")
+                    else:
+                        st.markdown(message.content)
                 else:
                     st.markdown(message.content)
-            else:
-                st.markdown(message.content)
+            except:
+                st.info(message)
 
     if prompt := st.chat_input(""):
         # Display user message in chat message container
@@ -177,10 +182,13 @@ else:
         )  # sst.messages.append({"role": "assistant", "content": answer})
         sst.checked.append(["GPT: " + full_resp, False])
 
-        if len(sst.messages) >= 10:
-            btn = st.download_button(
-                label="테스트 종료 및 txt 파일 저장",
-                data="\n".join([msg + " --> " + str(ch) for (msg, ch) in sst.checked]),
-                file_name=f"{sst.user_name}.txt",
-                on_click=display_link_msg,
-            )
+    if len(sst.messages) >= 4:
+        btn = st.download_button(
+            label="테스트 종료 및 txt 파일 저장",
+            data="\n".join([msg + " --> " + str(ch) for (msg, ch) in sst.checked]),
+            file_name=f"{sst.user_name}.txt",
+            on_click=display_link_msg,
+        )
+        if btn:
+            sst.messages.append("test")
+            sst.checked.append(["###################", False])
