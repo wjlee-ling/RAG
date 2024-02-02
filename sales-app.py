@@ -103,11 +103,11 @@ def display_link_msg():
 if sst.submit is False:
     with st.form("index"):
         sst.user_name = st.text_input("필수: **닉네임**을 입력해주세요.")
-        sst.question1 = st.radio("질문 1. 현재 올리브영에서 사고 싶은 제품이 있습니까?", ["예", "아니요"])
-        sst.question2 = st.select_slider(
-            "질문 2. 사고 싶은 제품이 있으시다면 (질문 1에서 '예' 선택) 얼마나 사고 싶은지 점수로 얘기해주세요. (사고 싶은 마음이 클수록 높은 숫자)",
-            options=range(1, 11),
-        )
+        # sst.question1 = st.radio("질문 1. 현재 올리브영에서 사고 싶은 제품이 있습니까?", ["예", "아니요"])
+        # sst.question2 = st.select_slider(
+        #     "질문 2. 사고 싶은 제품이 있으시다면 (질문 1에서 '예' 선택) 얼마나 사고 싶은지 점수로 얘기해주세요. (사고 싶은 마음이 클수록 높은 숫자)",
+        #     options=range(1, 11),
+        # )
         if sst.question1 == "아니요":
             sst.question2 = 1
 
