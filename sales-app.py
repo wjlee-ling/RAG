@@ -12,6 +12,7 @@ from streamlit import session_state as sst
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_community.callbacks import wandb_tracing_enabled
 from langchain_openai import ChatOpenAI
+from datetime import datetime
 
 # __import__("pysqlite3")
 # if "pysqlite3" in sys.modules:
@@ -60,7 +61,6 @@ GUIDELINE = """\
 2. 상황
 - 평가자는 제품 구매를 고민하는 고객으로서 세일즈봇과 이와 관련한 상담을 진행한다.
 3. 상세 규칙
-- 닉네임은 실명 대신 자유롭게 입력한다.
 - 고객이 문의하는 제품은 '올리브영'에서 판매하는 제품 중에서 자유롭게 선정 가능하다. (ex. 화장품, 영양제, 문구류 등)
 - 단, 물, 휴지, 샴푸, 치약, 룸스프레이 등 생필품이 아닌 '구매가 고민되는 제품'으로 상담을 진행한다.
 - 존대 혹은 반말 사용은 자유롭게 선택 가능하다.
@@ -86,12 +86,12 @@ if "messages" not in sst:
     sst.messages = []  # [AIMessage(content=GREETING)]
     sst.condense_llm = get_llm("gpt-4-0125-preview")
     sst.conversational_chain = get_conversational_chain(sst.condense_llm)
-    sst.sales_chain = get_sales_chain(TEST_MUSINSA_PROMPT)
+    sst.sales_chain = get_sales_chain(TEST_0131_PROMPT)
     sst.checked = []
     sst.submit = False
     sst.user_name = ""
 
-st.title("ㅌ넷 세일즈봇 대화 평가")
+st.title("ㅌ넷 세일즈봇 대화 평가: 시청")
 
 
 # with st.sidebar:
@@ -109,7 +109,7 @@ def display_link_msg():
 
 if sst.submit is False:
     with st.form("index"):
-        sst.user_name = st.text_input("필수: **닉네임**을 입력해주세요.")
+        sst.user_name = st.text_input("필수: **이름**을 입력해주세요.")
         # sst.question1 = st.radio("질문 1. 현재 올리브영에서 사고 싶은 제품이 있습니까?", ["예", "아니요"])
         # sst.question2 = st.select_slider(
         #     "질문 2. 사고 싶은 제품이 있으시다면 (질문 1에서 '예' 선택) 얼마나 사고 싶은지 점수로 얘기해주세요. (사고 싶은 마음이 클수록 높은 숫자)",
@@ -117,6 +117,9 @@ if sst.submit is False:
         # )
         # if sst.question1 == "아니요":
         #     sst.question2 = 1
+        now = datetime.now()
+        now = now.strftime("%Y-%m-%d %H:%M")
+        sst.user_name += f"--{now}"
 
         st.markdown("## 가이드라인")
         st.markdown(GUIDELINE)
@@ -195,6 +198,6 @@ else:
         btn = st.download_button(
             label="테스트 종료 및 txt 파일 저장",
             data="\n".join([msg + " --> " + str(ch) for (msg, ch) in sst.checked]),
-            file_name=f"{sst.user_name}.txt",
+            file_name=f"{sst.user_name}--시청.txt",
             on_click=display_link_msg,
         )
