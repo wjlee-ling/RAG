@@ -79,7 +79,7 @@ ex. 제품 구매 시, '그럼 그걸로 살게요' 등 / 구매 이탈 시, '�
 3. 대화 종료 버튼을 클릭하면 설문지 접속 링크를 확인할 수 있다.
 4. 평가 일정 내 반드시 설문 조사까지 응하여야 본 테스트가 종료된다.
 """
-LINK = "https://forms.gle/XGDMVfbmFNYMokkp8"  # "https://docs.google.com/forms/d/e/1FAIpQLSeYclgel-SOppJpslirbHye4Bh0dKbkoCwkGlfYaJIRyIN7lg/viewform"
+LINK = "https://forms.gle/DWfEFBujWrpNuyt6A"  # "https://forms.gle/XGDMVfbmFNYMokkp8"  # "https://docs.google.com/forms/d/e/1FAIpQLSeYclgel-SOppJpslirbHye4Bh0dKbkoCwkGlfYaJIRyIN7lg/viewform"
 
 
 if "messages" not in sst:
