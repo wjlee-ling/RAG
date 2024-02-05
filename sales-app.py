@@ -152,7 +152,6 @@ else:
         # Display user message in chat message container
         with st.chat_message("human"):
             st.markdown(prompt)
-            sst.checked.append(["유저: " + prompt, False])
 
         # Get assistant response
         print(sst.messages)
@@ -170,6 +169,7 @@ else:
         print(condense_question)
         # Add user message to chat history
         sst.messages.append(HumanMessage(content=prompt))
+        sst.checked.append([f"유저: {prompt} (condensed: {condense_question})", False])
 
         # step 2
         final_response = sst.sales_chain.stream(
