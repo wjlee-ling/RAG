@@ -47,7 +47,7 @@ NUM_TURN_LIMIT = 10
 GREETING = "안녕하세요. 올리브영입니다. 찾으시는 제품이 있거나 도움이 필요하시면 말씀해 주세요."
 GUIDELINE = """\
 ### 세일즈 봇이란?
-제품 구매를 망설이는 고객에게 대화를 통해 가장 적합한 제품을 추천하고 구매를 유도한다.
+제품 구매를 망설이는 고객에게 대화를 통해 가장 적합한 제품을 추천하고 구매를 유도하는 챗봇
                 
 ### 평가목적
 1. 고객의 입장에서 세일즈봇이 제품 구매를 얼마나 잘 유도하는지 평가한다. 
@@ -75,11 +75,11 @@ ex. 제품 구매 시, '그럼 그걸로 살게요' 등 / 구매 이탈 시, '�
 
 #### 설문지 참여
 1. 대화 테스트 종료 후, 설문 조사에 참여한다.
-2. 평가 일정 내 반드시 설문 조사까지 응하여야 본 테스트가 종료된다.
+2. 최소 5턴의 대화를 채우면 대화 종료 버튼을 확인할 수 있다.
+3. 대화 종료 버튼을 클릭하면 설문지 접속 링크를 확인할 수 있다.
+4. 평가 일정 내 반드시 설문 조사까지 응하여야 본 테스트가 종료된다.
 """
-LINK = (
-    "https://docs.google.com/forms/d/1bI9DQyiwT3bm_Qr11c5lKWSs7gROTUDCPIkhjbIhNac/edit"
-)
+LINK = "https://docs.google.com/forms/d/e/1FAIpQLSeYclgel-SOppJpslirbHye4Bh0dKbkoCwkGlfYaJIRyIN7lg/viewform"
 
 
 if "messages" not in sst:
@@ -124,6 +124,8 @@ if sst.submit is False:
         st.markdown("## 가이드라인")
         st.markdown(GUIDELINE)
         sst.submit = st.form_submit_button("세일즈봇과 대화 시작")
+        if sst.submit:
+            st.rerun()
 
 else:
     with st.expander("가이드라인 다시 읽기", expanded=False):
@@ -138,7 +140,7 @@ else:
             try:
                 if role == "ai":
                     if sst.checked[i][1] == True:
-                        st.markdown(":red[" + message.content + "]")
+                        st.error(f"{message.content}")
                     else:
                         st.markdown(message.content)
                 else:
@@ -156,12 +158,15 @@ else:
         print(sst.messages)
         # with wandb_tracing_enabled():
         # step 1
-        condense_question = sst.conversational_chain.invoke(
-            {
-                "question": prompt,
-                "chat_history": sst.messages,
-            }
-        )
+        if len(sst.messages) == 0:
+            condense_question = prompt
+        else:
+            condense_question = sst.conversational_chain.invoke(
+                {
+                    "question": prompt,
+                    "chat_history": sst.messages,
+                }
+            )
         print(condense_question)
         # Add user message to chat history
         sst.messages.append(HumanMessage(content=prompt))
