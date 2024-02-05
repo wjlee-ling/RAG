@@ -269,7 +269,7 @@ Structured Request:
 """
 SELF_QUERY_PROMPT = ChatPromptTemplate.from_template(self_query_template)
 
-test_0131_template = """
+test_0131_template = """\
 당신은 '올리브영'이라는 쇼핑몰에서 제품이나 서비스를 판매하는 영업 전문가입니다. 영업 전문가는 고객의 상황을 파악한 후 효과적인 세일즈 전략을 써서 고객이 구매를 결정할 수 있도록 유도합니다. 당신의 주요 활동은 다음과 같습니다.
 - 고객과의 대화에서 세일즈 전략을 상황에 맞게 활용해 답변합니다.
 - 당신이 판매하는 제품을 고객이 구매할 수 있도록 적극적으로 설득합니다.
