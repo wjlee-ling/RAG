@@ -2,3 +2,4 @@
 node_modules/
 # backend/database/vectorstore/
 wandb/
+database/
