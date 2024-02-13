@@ -13,9 +13,17 @@ wandb = "*"
 streamlit = "*"
 pysqlite3-binary = "*"
 pinecone-client = "*"
+pypandoc-binary = "*"
+sagemaker = "*"
+huggingface-hub = "*"
+langchain-pinecone = "*"
 
 [dev-packages]
 lark = "*"
+unstructured = {extras = ["all-docs"], version = "*"}
+pydantic = "*"
+pypandoc = "*"
+pandoc = "*"
 
 [requires]
 python_version = "3.10"

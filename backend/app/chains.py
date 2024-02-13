@@ -17,6 +17,26 @@ from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 
 
+def build_pinecone_retrieval_chain(
+    vectorstore,
+) -> Dict:
+    retriever = vectorstore.as_retriever()
+    llm = ChatOpenAI(model_name="gpt-4-0125-preview", temperature=0, verbose=True)
+
+    rag_chain_from_docs = (
+        RunnablePassthrough.assign(context=(lambda x: combine_docs(x["context"])))
+        | RETRIEVAL_PROMPT
+        | llm
+        | StrOutputParser()
+    )
+
+    rag_chain_with_source = RunnableParallel(
+        {"context": retriever, "question": RunnablePassthrough()}
+    ).assign(answer=rag_chain_from_docs)
+
+    return rag_chain_with_source
+
+
 def build_conversational_retrieval_chain(
     collection_name,
     user_retrieval_prompt=None,
