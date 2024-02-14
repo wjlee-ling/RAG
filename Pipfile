@@ -12,6 +12,8 @@ pinecone-client = "*"
 langchain-pinecone = "*"
 wandb = "*"
 chromadb = "==0.3.29"
+transformers = "*"
+torch = "*"
 
 [dev-packages]
 pydantic = "*"
