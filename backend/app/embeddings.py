@@ -1,4 +1,6 @@
 from typing import List
+
+from langchain_core.embeddings import Embeddings
 from transformers import AutoModel, AutoTokenizer
 
 
@@ -17,3 +19,15 @@ def get_roberta_embeddings(sentences: List[str]):
         vector = embedding[0].detach().numpy().tolist()
         ls.append(vector)
     return ls
+
+
+class KorRobertaEmbeddings(Embeddings):
+    """Feature Extraction w/ BM-K/KoSimCSE-roberta"""
+
+    dimension = 768
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        return get_roberta_embeddings(texts)
+
+    def embed_query(self, text: str) -> List[float]:
+        return get_roberta_embeddings([text])[0]

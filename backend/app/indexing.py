@@ -9,60 +9,12 @@ from langchain.text_splitter import (
     MarkdownHeaderTextSplitter,
 )
 from langchain_core.documents import Document
-from langchain_community.vectorstores import Chroma, Pinecone
+from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
 
 
 load_dotenv()
 PINECONE_API_KEY = os.environ.get("PINECONE_API_KEY")
-
-
-def add_to_metadata(docs: Iterable[Document]) -> Iterable[Document]:
-    """상품 판매정보 (가격, 상품명 등)를 메타데이터로 사용하기 위해 `DocumentLoader`로 로드된 doc의 메타데이터로 등록"""
-    import re
-
-    pattern = r"- (\w+): (.+)"
-    mapping = {
-        "prdDisplayName": "name",  # "상품명",
-        "prdBrand": "brand",  # "브랜드",
-        "prdPrice": "price",  # "정가",
-        "prdSalePrice": "sale-price",  # "판매가",
-        "prdCategory": "category",  # "분류",
-    }
-
-    for doc in docs:
-        text_prd = re.search(
-            r"(?<=## 판매 정보).+(?=## 상품정보 제공고시)", doc.page_content, re.DOTALL
-        ).group()  # re.DOTALL setting for matching '.' with newlines as well
-        matches = re.findall(pattern, text_prd)
-        new_metadata = {}
-        for match in matches:
-            if match[0] in ["prdPrice", "prdSalePrice"]:
-                try:
-                    new_metadata[mapping[match[0]]] = int(
-                        match[1].strip("원,'~ ").replace(",", "")
-                    )
-                except:
-                    new_metadata[mapping["prdPrice"]] = None
-            else:
-                new_metadata[mapping[match[0]]] = match[1].strip(",' ")
-        if new_metadata[mapping["prdPrice"]] is None:  #  no sale
-            new_metadata[mapping["prdPrice"]] = new_metadata[mapping["prdSalePrice"]]
-        doc.metadata.update(new_metadata)
-    return docs
-
-
-def append_metadata_to_data(docs: Iterable[Document]) -> Iterable[Document]:
-    """chunk에 메타데이터로 들어가 있는 제품정보 추가"""
-    import json
-
-    for doc in docs:
-        if "## 판매 정보" not in doc.page_content:
-            metadata_str = json.dumps(doc.metadata, ensure_ascii=False)
-            doc.page_content = (
-                "## 판매 정보\n" + metadata_str + "\n---\n\n" + doc.page_content
-            )
-    return docs
 
 
 def create_or_get_pinecone_index(index_name: str, dimension: int = 1536):
@@ -86,24 +38,56 @@ def create_or_get_pinecone_index(index_name: str, dimension: int = 1536):
     return pc_index
 
 
-def get_pinecone_vectorstore(index_name: str, embedding_fn=OpenAIEmbeddings()):
+def get_pinecone_vectorstore(
+    index_name: str,
+    embedding_fn=OpenAIEmbeddings(),
+    dimension: int = 1536,
+    namespace: str = None,
+):
     from langchain_pinecone import Pinecone
 
-    index = create_or_get_pinecone_index(index_name)
+    index = create_or_get_pinecone_index(
+        index_name,
+        dimension,
+    )
 
-    # from langchain.vectorstores import Pinecone
-    # vs = Pinecone(index, embedding_fn, "text")
     vs = Pinecone(
         index,
         embedding_fn,
         pinecone_api_key=PINECONE_API_KEY,
         index_name=index_name,
+        namespace=namespace,
     )
 
     return vs
 
 
-# def upsert_docs_to_pinecone(vectorstore, docs:List[Document]):
+def upsert_docs_to_pinecone(
+    index_name, embedding_fn, docs: List[Document], namespace: str = None
+):
+    from langchain_pinecone import Pinecone
+
+    texts, metadatas, ids = [], [], []
+    for doc in docs:
+        ids.append(doc.metadata.pop("id", None))
+        texts.append(doc.page_content)
+        metadatas.append(doc.metadata)
+
+    if ids[0] is None:
+        ids = None
+
+    ids = Pinecone.from_texts(
+        texts=texts,
+        embedding=embedding_fn,
+        metadatas=metadatas,
+        ids=ids,
+        index_name=index_name,
+        namespace=namespace,
+        embedding_chunk_size=1000,  # set to a high number
+        show_progress=True,
+    )
+    counts = len(ids)
+    print(f"💥Upserted {str(counts)} new document(s) to Pinecone.")
 
 
 def create_chromadb_index():
