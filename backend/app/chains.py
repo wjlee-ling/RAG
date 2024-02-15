@@ -23,7 +23,6 @@ from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 
 
 def build_pinecone_retrieval_chain(
-    predictor,
     vectorstore,
 ) -> Dict:
 
@@ -38,13 +37,12 @@ def build_pinecone_retrieval_chain(
             context=(lambda x: __extract_answer_from_docs(x["context"]))
         )
         | RETRIEVAL_PROMPT
-        | RunnableLambda(lambda x: predictor.predict({"inputs": x}))
-        # | StrOutputParser()
+        | RunnableLambda(lambda x: [m.content for m in x.to_messages()][-1])
     )
 
     rag_chain_with_source = RunnableParallel(
         {"context": retriever, "question": RunnablePassthrough()}
-    ).assign(final_answer=rag_chain_from_docs)
+    ).assign(final_prompt=rag_chain_from_docs)
 
     return rag_chain_with_source
 
