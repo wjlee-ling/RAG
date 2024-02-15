@@ -13,7 +13,7 @@ langchain-pinecone = "*"
 wandb = "*"
 chromadb = "==0.3.29"
 transformers = "*"
-torch = "*"
+torch = ">=2.0.0, !=2.0.1, !=2.1.0"
 langchain-core = "*"
 
 [dev-packages]
