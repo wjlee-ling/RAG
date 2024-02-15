@@ -63,29 +63,11 @@ def get_pinecone_vectorstore(
 
 
 def upsert_docs_to_pinecone(
-    index_name, embedding_fn, docs: List[Document], namespace: str = None
+    vectorstore,
+    docs: List[Document],
+    namespace: str = None,
 ):
-    from langchain_pinecone import Pinecone
-
-    texts, metadatas, ids = [], [], []
-    for doc in docs:
-        ids.append(doc.metadata.pop("id", None))
-        texts.append(doc.page_content)
-        metadatas.append(doc.metadata)
-
-    if ids[0] is None:
-        ids = None
-
-    ids = Pinecone.from_texts(
-        texts=texts,
-        embedding=embedding_fn,
-        metadatas=metadatas,
-        ids=ids,
-        index_name=index_name,
-        namespace=namespace,
-        embedding_chunk_size=1000,  # set to a high number
-        show_progress=True,
-    )
+    ids = vectorstore.add_documents(docs, nampespace=namespace)
     counts = len(ids)
     print(f"💥Upserted {str(counts)} new document(s) to Pinecone.")
 
