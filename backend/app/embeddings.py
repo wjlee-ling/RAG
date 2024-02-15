@@ -1,7 +1,10 @@
 from typing import List
 
+import os
 from langchain_core.embeddings import Embeddings
 from transformers import AutoModel, AutoTokenizer
+
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
 def get_roberta_embeddings(sentences: List[str]):
@@ -10,6 +13,7 @@ def get_roberta_embeddings(sentences: List[str]):
     Returns:
         List[List[int]] of dimension 768
     """
+
     model = AutoModel.from_pretrained("BM-K/KoSimCSE-roberta")
     tokenizer = AutoTokenizer.from_pretrained("BM-K/KoSimCSE-roberta")
     inputs = tokenizer(sentences, padding=True, truncation=True, return_tensors="pt")
