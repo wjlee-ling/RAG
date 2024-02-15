@@ -1,6 +1,7 @@
 from backend.app.chains import build_pinecone_retrieval_chain
 from backend.app.indexing import get_pinecone_vectorstore
 from backend.app.embeddings import KorRobertaEmbeddings
+from backend.app.utils.aws import deploy_sagemaker_model
 
 import os
 import sys
@@ -16,7 +17,7 @@ if "messages" not in sst:
 
 
 @st.cache_resource
-def get_pinecone_retrieval_chain(collection_name):
+def get_pinecone_retrieval_chain(model_name, collection_name):
     print("☑️ Building a new pinecone retrieval chain...")
     pinecone_vectorstore = get_pinecone_vectorstore(
         index_name=collection_name,
@@ -24,7 +25,10 @@ def get_pinecone_retrieval_chain(collection_name):
         dimension=768,
         namespace=None,
     )
-    chain = build_pinecone_retrieval_chain(pinecone_vectorstore)
+    print("☑️ Deploying a sLLM to AWS Sagemaker...")
+    predictor = deploy_sagemaker_model(model_name)
+
+    chain = build_pinecone_retrieval_chain(predictor, pinecone_vectorstore)
     return chain
 
 
@@ -36,7 +40,11 @@ st.title("RAG 데모")
 #     with st.chat_message(role):
 #         st.markdown(message.content)
 
-sst.retrieval_chain = get_pinecone_retrieval_chain("innocean")
+with st.spinner("환경 설정 중"):
+    sst.retrieval_chain = get_pinecone_retrieval_chain(
+        model_name="mncai/mistral-7b-v5",
+        collection_name="innocean",
+    )
 if prompt := st.chat_input("정보 검색"):
 
     # Display user message in chat message container
@@ -45,18 +53,18 @@ if prompt := st.chat_input("정보 검색"):
 
     # Get assistant response
     response = sst.retrieval_chain.invoke(prompt)
+    print(response)
+    st.markdown(response)
 
-    retrieval_answer = response["final_answer"]
-    retrieval_docs = response["context"]
+    # retrieval_answer = response["final_answer"]
+    # retrieval_docs = response["context"]
 
-    # Display assistant response in chat message container
-    with st.chat_message("assistant"):
-        st.markdown(retrieval_answer)
+    # # Display assistant response in chat message container
+    # with st.chat_message("assistant"):
+    #     st.markdown(retrieval_answer)
 
-        with st.expander("정보 검색시 참고한 chunk"):
-            tabs = st.tabs([f"doc{i}" for i in range(len(retrieval_docs))])
-            for i in range(len(retrieval_docs)):
-                tabs[i].write(retrieval_docs[i].page_content)
-                tabs[i].write(retrieval_docs[i].metadata)
-            # for doc in retrieval_docs:
-            #     st.markdown(doc.page_content)
+    #     with st.expander("정보 검색시 참고한 chunk"):
+    #         tabs = st.tabs([f"doc{i}" for i in range(len(retrieval_docs))])
+    #         for i in range(len(retrieval_docs)):
+    #             tabs[i].write(retrieval_docs[i].page_content)
+    #             tabs[i].write(retrieval_docs[i].metadata)

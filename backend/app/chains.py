@@ -12,16 +12,23 @@ from langchain.schema import format_document
 from langchain_core.messages import AIMessage, HumanMessage, get_buffer_string
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough, RunnableParallel
+from langchain_core.runnables import (
+    RunnablePassthrough,
+    RunnableParallel,
+    RunnableLambda,
+)
+
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 
 
 def build_pinecone_retrieval_chain(
+    predictor,
     vectorstore,
 ) -> Dict:
+
     retriever = vectorstore.as_retriever()
-    llm = ChatOpenAI(model_name="gpt-4-0125-preview", temperature=0, verbose=True)
+    # llm = ChatOpenAI(model_name="gpt-4-0125-preview", temperature=0, verbose=True)
 
     def __extract_answer_from_docs(docs):
         return "\n\n".join([doc.metadata["answer"] for doc in docs])
@@ -31,8 +38,8 @@ def build_pinecone_retrieval_chain(
             context=(lambda x: __extract_answer_from_docs(x["context"]))
         )
         | RETRIEVAL_PROMPT
-        | llm
-        | StrOutputParser()
+        | RunnableLambda(lambda x: predictor.predict({"inputs": x}))
+        # | StrOutputParser()
     )
 
     rag_chain_with_source = RunnableParallel(
