@@ -4,7 +4,6 @@ from backend.app.embeddings import KorRobertaEmbeddings
 
 import os
 import sys
-import wandb
 import streamlit as st
 from streamlit import session_state as sst
 
@@ -15,10 +14,6 @@ from langchain_community.callbacks import wandb_tracing_enabled
 
 if "messages" not in sst:
     sst.messages = []
-
-
-# os.environ["OPENAI_API_KEY"] = st.secrets["OPENAI_API_KEY"]
-wandb.init(entity="wjlee-ling", project="demo")
 
 
 @st.cache_resource
@@ -50,11 +45,10 @@ if prompt := st.chat_input("정보 검색"):
         st.markdown(prompt)
 
     # Get assistant response
-    with wandb_tracing_enabled():
-        response = sst.retrieval_chain.invoke(prompt)
+    response = sst.retrieval_chain.invoke(prompt)
 
-        retrieval_answer = response["final_answer"]
-        retrieval_docs = response["context"]
+    retrieval_answer = response["final_answer"]
+    retrieval_docs = response["context"]
 
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
