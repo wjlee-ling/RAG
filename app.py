@@ -9,7 +9,6 @@ from streamlit import session_state as sst
 
 # from langchain_core.prompts import ChatPromptTemplate
 # from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from langchain_community.callbacks import wandb_tracing_enabled
 
 
 if "messages" not in sst:
